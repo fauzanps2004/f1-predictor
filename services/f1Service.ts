@@ -1,4 +1,4 @@
-import { POINTS_SYSTEM, DRIVERS } from '../constants';
+import { POINTS_SYSTEM, DRIVERS, FULL_2025_CALENDAR } from '../constants';
 import { SimulationResult, ProjectedStanding, ProjectedConstructorStanding, Standing, ConstructorStanding, RaceWeekend } from '../types';
 
 // Map Ergast API Constructor IDs to Internal IDs
@@ -25,6 +25,12 @@ export const fetch2025Calendar = async (): Promise<RaceWeekend[] | null> => {
     if (!res.ok) throw new Error("OpenF1 API Error");
     
     const data = await res.json();
+    
+    // If API returns no meetings (early 2025), use our official constant
+    if (!data || data.length === 0) {
+        return FULL_2025_CALENDAR;
+    }
+
     const today = new Date();
     
     // OpenF1 returns "meetings" (race weekends). We filter for actual Grand Prix sessions.
@@ -37,15 +43,15 @@ export const fetch2025Calendar = async (): Promise<RaceWeekend[] | null> => {
             id: `gp-${meeting.meeting_key}`,
             name: meeting.meeting_name,
             round: index + 1,
-            isSprint: meeting.meeting_name.toLowerCase().includes('sprint') || [2, 6, 11, 19, 21, 23].includes(index + 1), 
+            isSprint: meeting.meeting_name.toLowerCase().includes('sprint') || [2, 6, 11, 19, 21, 23].includes(index + 1), // Check official sprint list
             hasOccurred: raceDate < today, // True if the race start date is in the past
         };
       });
 
-    return races.length > 0 ? races : null;
+    return races.length > 0 ? races : FULL_2025_CALENDAR;
   } catch (e) {
-    console.warn("Failed to fetch OpenF1 calendar:", e);
-    return null;
+    console.warn("Failed to fetch OpenF1 calendar, using fallback:", e);
+    return FULL_2025_CALENDAR;
   }
 };
 
