@@ -13,70 +13,44 @@ export const TEAMS: Record<string, Team> = {
   sau: { id: 'sau', name: 'Kick Sauber', color: '#52E252' },
 };
 
-// Official 2025 Grid - Sorted by 2024 WCC Finish Order for initial cleanliness
+// Official 2024 Season Finale Grid (Post-Vegas)
 export const DRIVERS: Driver[] = [
-  // McLaren (1st)
-  { id: 'nor', code: 'NOR', firstName: 'Lando', lastName: 'Norris', teamId: 'mcl', color: '#FF8000' },
-  { id: 'pia', code: 'PIA', firstName: 'Oscar', lastName: 'Piastri', teamId: 'mcl', color: '#FF8000' },
-  // Ferrari (2nd)
-  { id: 'lec', code: 'LEC', firstName: 'Charles', lastName: 'Leclerc', teamId: 'fer', color: '#E8002D' },
-  { id: 'ham', code: 'HAM', firstName: 'Lewis', lastName: 'Hamilton', teamId: 'fer', color: '#E8002D' },
-  // Red Bull (3rd)
+  // Red Bull
   { id: 'ver', code: 'VER', firstName: 'Max', lastName: 'Verstappen', teamId: 'rbr', color: '#3671C6' },
   { id: 'per', code: 'PER', firstName: 'Sergio', lastName: 'Perez', teamId: 'rbr', color: '#3671C6' },
-  // Mercedes (4th)
+  // McLaren
+  { id: 'nor', code: 'NOR', firstName: 'Lando', lastName: 'Norris', teamId: 'mcl', color: '#FF8000' },
+  { id: 'pia', code: 'PIA', firstName: 'Oscar', lastName: 'Piastri', teamId: 'mcl', color: '#FF8000' },
+  // Ferrari
+  { id: 'lec', code: 'LEC', firstName: 'Charles', lastName: 'Leclerc', teamId: 'fer', color: '#E8002D' },
+  { id: 'sai', code: 'SAI', firstName: 'Carlos', lastName: 'Sainz', teamId: 'fer', color: '#E8002D' },
+  // Mercedes
   { id: 'rus', code: 'RUS', firstName: 'George', lastName: 'Russell', teamId: 'mer', color: '#27F4D2' },
-  { id: 'ant', code: 'ANT', firstName: 'Kimi', lastName: 'Antonelli', teamId: 'mer', color: '#27F4D2' },
-  // Aston Martin (5th)
+  { id: 'ham', code: 'HAM', firstName: 'Lewis', lastName: 'Hamilton', teamId: 'mer', color: '#27F4D2' },
+  // Aston Martin
   { id: 'alo', code: 'ALO', firstName: 'Fernando', lastName: 'Alonso', teamId: 'ast', color: '#229971' },
   { id: 'str', code: 'STR', firstName: 'Lance', lastName: 'Stroll', teamId: 'ast', color: '#229971' },
-  // Alpine (6th)
+  // Alpine
   { id: 'gas', code: 'GAS', firstName: 'Pierre', lastName: 'Gasly', teamId: 'alp', color: '#0093CC' },
-  { id: 'doo', code: 'DOO', firstName: 'Jack', lastName: 'Doohan', teamId: 'alp', color: '#0093CC' },
-  // Haas (7th)
-  { id: 'oco', code: 'OCO', firstName: 'Esteban', lastName: 'Ocon', teamId: 'haa', color: '#B6BABD' },
-  { id: 'bea', code: 'BEA', firstName: 'Oliver', lastName: 'Bearman', teamId: 'haa', color: '#B6BABD' },
-  // VCARB (8th)
+  { id: 'oco', code: 'OCO', firstName: 'Esteban', lastName: 'Ocon', teamId: 'alp', color: '#0093CC' },
+  // Williams
+  { id: 'alb', code: 'ALB', firstName: 'Alex', lastName: 'Albon', teamId: 'wil', color: '#64C4FF' },
+  { id: 'col', code: 'COL', firstName: 'Franco', lastName: 'Colapinto', teamId: 'wil', color: '#64C4FF' },
+  // VCARB
   { id: 'tsu', code: 'TSU', firstName: 'Yuki', lastName: 'Tsunoda', teamId: 'rb', color: '#6692FF' },
   { id: 'law', code: 'LAW', firstName: 'Liam', lastName: 'Lawson', teamId: 'rb', color: '#6692FF' },
-  // Williams (9th)
-  { id: 'alb', code: 'ALB', firstName: 'Alex', lastName: 'Albon', teamId: 'wil', color: '#64C4FF' },
-  { id: 'sai', code: 'SAI', firstName: 'Carlos', lastName: 'Sainz', teamId: 'wil', color: '#64C4FF' },
-  // Sauber (10th)
-  { id: 'hul', code: 'HUL', firstName: 'Nico', lastName: 'Hulkenberg', teamId: 'sau', color: '#52E252' },
-  { id: 'bor', code: 'BOR', firstName: 'Gabriel', lastName: 'Bortoleto', teamId: 'sau', color: '#52E252' },
+  // Haas
+  { id: 'hul', code: 'HUL', firstName: 'Nico', lastName: 'Hulkenberg', teamId: 'haa', color: '#B6BABD' },
+  { id: 'mag', code: 'MAG', firstName: 'Kevin', lastName: 'Magnussen', teamId: 'haa', color: '#B6BABD' },
+  // Sauber
+  { id: 'bot', code: 'BOT', firstName: 'Valtteri', lastName: 'Bottas', teamId: 'sau', color: '#52E252' },
+  { id: 'zho', code: 'ZHO', firstName: 'Guanyu', lastName: 'Zhou', teamId: 'sau', color: '#52E252' },
 ];
 
-// Fallback data: 2025 Start (0 Points)
-export const FALLBACK_WDC_STANDINGS: Standing[] = DRIVERS.map((d, i) => ({
-  position: i + 1,
-  driverId: d.id,
-  points: 0,
-  wins: 0
-}));
-
-export const FALLBACK_WCC_STANDINGS: ConstructorStanding[] = [
-  { position: 1, teamId: 'mcl', points: 0 },
-  { position: 2, teamId: 'fer', points: 0 },
-  { position: 3, teamId: 'rbr', points: 0 },
-  { position: 4, teamId: 'mer', points: 0 },
-  { position: 5, teamId: 'ast', points: 0 },
-  { position: 6, teamId: 'alp', points: 0 },
-  { position: 7, teamId: 'haa', points: 0 },
-  { position: 8, teamId: 'rb', points: 0 },
-  { position: 9, teamId: 'wil', points: 0 },
-  { position: 10, teamId: 'sau', points: 0 },
-];
-
-// Default initial races in case OpenF1 fails
-export const REMAINING_RACES: RaceWeekend[] = [
-  { id: 'aus', name: 'Australian Grand Prix', round: 1, isSprint: false, hasOccurred: false },
-  { id: 'chn', name: 'Chinese Grand Prix', round: 2, isSprint: true, hasOccurred: false },
-  { id: 'jpn', name: 'Japanese Grand Prix', round: 3, isSprint: false, hasOccurred: false },
-];
-
-export const POINTS_SYSTEM = {
-  race: [25, 18, 15, 12, 10, 8, 6, 4, 2, 1],
-  sprint: [8, 7, 6, 5, 4, 3, 2, 1],
-  fastestLap: 1,
-};
+// Fallback data: Post-Las Vegas 2024
+export const FALLBACK_WDC_STANDINGS: Standing[] = [
+  { position: 1, driverId: 'ver', points: 403, wins: 8 },
+  { position: 2, driverId: 'nor', points: 340, wins: 3 },
+  { position: 3, driverId: 'lec', points: 319, wins: 3 },
+  { position: 4, driverId: 'pia', points: 292, wins: 2 },
+  { position: 5
