@@ -28,22 +28,24 @@ const App: React.FC = () => {
     const initData = async () => {
       setLoading(true);
       
-      // Fetch Calendar from OpenF1
+      // Fetch Calendar from OpenF1 (or use fallback which is configured for Post-Vegas)
       const calendarData = await fetch2025Calendar();
       if (calendarData) {
         setRaces(calendarData);
         
         // Auto-select the NEXT race (first one that hasn't occurred)
+        // With current fallback, this should be Qatar (Round 23)
         const nextRace = calendarData.find(r => !r.hasOccurred);
         if (nextRace) {
             setSelectedRace(nextRace);
         } else {
-            // Fallback to first race if all done or none found
-            setSelectedRace(calendarData[0]);
+            // Fallback to last race if all done
+            setSelectedRace(calendarData[calendarData.length - 1]);
         }
       }
 
       // Fetch Standings
+      // fetchCurrentStandings will returns null to enforce our Fallback Post-Vegas data
       const data = await fetchCurrentStandings();
       if (data) {
         setBaseWdc(data.wdc);
@@ -80,7 +82,7 @@ const App: React.FC = () => {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-4">
         <Loader2 className="w-12 h-12 animate-spin text-f1-red" />
-        <p className="font-mono text-sm uppercase tracking-widest animate-pulse">Initializing 2025 Season...</p>
+        <p className="font-mono text-sm uppercase tracking-widest animate-pulse">Initializing Post-Vegas Scenario...</p>
       </div>
     );
   }
@@ -105,7 +107,7 @@ const App: React.FC = () => {
              {/* Race Selector */}
             <div className="relative group flex items-center gap-2">
                 {!selectedRace.hasOccurred && (
-                    <span className="hidden md:flex items-center gap-1 text-[10px] bg-f1-red text-white px-2 py-1 rounded uppercase font-bold tracking-wider animate-pulse">
+                    <span className="hidden md:flex items-center gap-1.5 text-[10px] bg-f1-red text-white px-2 py-1 rounded-sm uppercase font-bold tracking-wider animate-pulse shadow-[0_0_10px_rgba(255,24,1,0.5)]">
                         <CalendarClock className="w-3 h-3" /> Up Next
                     </span>
                 )}

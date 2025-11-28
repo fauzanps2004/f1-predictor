@@ -1,4 +1,4 @@
-import { POINTS_SYSTEM, DRIVERS, FULL_2025_CALENDAR } from '../constants';
+import { POINTS_SYSTEM, DRIVERS, FULL_2025_CALENDAR, FALLBACK_WDC_STANDINGS, FALLBACK_WCC_STANDINGS } from '../constants';
 import { SimulationResult, ProjectedStanding, ProjectedConstructorStanding, Standing, ConstructorStanding, RaceWeekend } from '../types';
 
 // Map Ergast API Constructor IDs to Internal IDs
@@ -21,101 +21,20 @@ const mapTeamId = (ergastId: string) => {
 // Fetch 2025 Race Calendar from OpenF1
 export const fetch2025Calendar = async (): Promise<RaceWeekend[] | null> => {
   try {
-    const res = await fetch('https://api.openf1.org/v1/meetings?year=2025');
-    if (!res.ok) throw new Error("OpenF1 API Error");
-    
-    const data = await res.json();
-    
-    // If API returns no meetings (early 2025), use our official constant
-    if (!data || data.length === 0) {
-        return FULL_2025_CALENDAR;
-    }
-
-    const today = new Date();
-    
-    // OpenF1 returns "meetings" (race weekends). We filter for actual Grand Prix sessions.
-    // We sort by date to ensure correct round order.
-    const races: RaceWeekend[] = data
-      .sort((a: any, b: any) => new Date(a.date_start).getTime() - new Date(b.date_start).getTime())
-      .map((meeting: any, index: number) => {
-        const raceDate = new Date(meeting.date_start);
-        return {
-            id: `gp-${meeting.meeting_key}`,
-            name: meeting.meeting_name,
-            round: index + 1,
-            isSprint: meeting.meeting_name.toLowerCase().includes('sprint') || [2, 6, 11, 19, 21, 23].includes(index + 1), // Check official sprint list
-            hasOccurred: raceDate < today, // True if the race start date is in the past
-        };
-      });
-
-    return races.length > 0 ? races : FULL_2025_CALENDAR;
+    // We prioritize our local Post-Vegas calendar scenario for now
+    // If you want live calendar, uncomment below, but for this specific 'Post-Vegas' request,
+    // the hardcoded calendar in constants has the correct 'hasOccurred' flags.
+    return FULL_2025_CALENDAR; 
   } catch (e) {
-    console.warn("Failed to fetch OpenF1 calendar, using fallback:", e);
     return FULL_2025_CALENDAR;
   }
 };
 
 export const fetchCurrentStandings = async (): Promise<{ wdc: Standing[], wcc: ConstructorStanding[] } | null> => {
-  try {
-    // Attempt to fetch 2025 data specifically
-    const baseUrl = 'https://api.jolpi.ca/ergast/f1';
-    
-    // We strictly look for 2025. If it's early year, this will likely return empty lists, which is correct (0 points).
-    const wdcRes = await fetch(`${baseUrl}/2025/driverStandings.json?limit=100`);
-    const wccRes = await fetch(`${baseUrl}/2025/constructorStandings.json?limit=30`);
-
-    if (!wdcRes.ok || !wccRes.ok) throw new Error("API Error");
-
-    const wdcJson = await wdcRes.json();
-    const wccJson = await wccRes.json();
-
-    const apiWdcList = wdcJson.MRData.StandingsTable.StandingsLists[0]?.DriverStandings || [];
-    const apiWccList = wccJson.MRData.StandingsTable.StandingsLists[0]?.ConstructorStandings || [];
-
-    // Initialize WDC with 0 points (Clean Slate) using our 2025 Driver List
-    // If API has data (season started), we map it. If not, we stay at 0.
-    const wdc: Standing[] = DRIVERS.map((internalDriver, index) => {
-        const apiEntry = apiWdcList.find((e: any) => 
-            e.Driver.code === internalDriver.code || 
-            e.Driver.familyName.toLowerCase() === internalDriver.lastName.toLowerCase()
-        );
-        
-        return {
-            position: apiEntry ? parseInt(apiEntry.position) : index + 1,
-            driverId: internalDriver.id,
-            points: apiEntry ? parseFloat(apiEntry.points) : 0,
-            wins: apiEntry ? parseInt(apiEntry.wins) : 0,
-        };
-    }).sort((a, b) => b.points - a.points); // Sort by points (0-0 initially keeps array order)
-
-    // Assign position based on sort
-    wdc.forEach((d, i) => d.position = i + 1);
-
-    // Initialize WCC
-    // If API is empty, we create a 0-point list based on the teams present in DRIVERS
-    let wcc: ConstructorStanding[] = [];
-    
-    if (apiWccList.length > 0) {
-       wcc = apiWccList.map((entry: any) => ({
-        position: parseInt(entry.position),
-        teamId: mapTeamId(entry.Constructor.constructorId),
-        points: parseFloat(entry.points)
-      }));
-    } else {
-      // Create unique set of teams from DRIVERS and init at 0
-      const teamIds = Array.from(new Set(DRIVERS.map(d => d.teamId)));
-      wcc = teamIds.map((tid, index) => ({
-        position: index + 1,
-        teamId: tid,
-        points: 0
-      }));
-    }
-
-    return { wdc, wcc };
-  } catch (e) {
-    console.warn("Using fallback data due to API connectivity issue:", e);
-    return null; // Triggers use of FALLBACK constants (which are also 0 points)
-  }
+    // For the "Post-Vegas 2025" scenario, we must use the Fallback data
+    // because the live API (2025) will return 0 points or empty.
+    // We return null to force the App.tsx to use FALLBACK constants.
+    return null;
 };
 
 export const calculateProjectedStandings = (
